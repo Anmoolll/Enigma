@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs"
 import { sendVerificationEmail } from "@/helpers/SendVerificationEmail";
 
 export async function POST(request: Request){
-    await dbConnect;
+    await dbConnect();
 
     try {
         const {username, email, password} = await request.json()
