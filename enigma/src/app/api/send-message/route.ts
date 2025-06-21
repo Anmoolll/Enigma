@@ -24,17 +24,18 @@ export async function POST(request:Request) {
         }
 
         const newMessage = {content, createdAt : new Date()}
-        user.message.push(newMessage as Message)
+        user.messages.push(newMessage as Message)
         await user.save()
+        console.log('Saved user messages:', user.messages);
 
         return Response.json(
             { message: 'Message Sent Successfully', success: true },
-            { status: 404 }
+            { status: 200 }
         );
     } catch (error) {
         console.log("Error sending messages", error)
         return Response.json(
-            {
+            { 
                 success : false,
                 message : "Internal Server Error occured"
             },
