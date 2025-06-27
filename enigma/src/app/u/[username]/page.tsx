@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CardHeader, CardContent, Card } from '@/components/ui/card';
-import { useCompletion } from 'ai/react';
+import { useChat } from 'ai/react';
 import {
   Form,
   FormControl,
@@ -34,19 +34,23 @@ const parseStringMessages = (messageString: string): string[] => {
 const initialMessageString =
   "What's your favorite movie?||Do you have any pets?||What's your dream job?";
   
-  export default function SendMessage() {
-    const params = useParams<{ username: string }>();
-    const username = params.username;
-    
+export default function SendMessage() {
+  const params = useParams<{ username: string }>();
+  const username = params.username;
+  
   const { toast } = useToast(); 
   const {
-    complete,
-    completion,
+    messages,
+    setMessages,
     isLoading: isSuggestLoading,
     error,
-  } = useCompletion({
+    append
+  } = useChat({
     api: '/api/suggest-messages',
-    initialCompletion: initialMessageString,
+    initialMessages: [],
+    body: {
+      username
+    }
   });
 
   const form = useForm<z.infer<typeof messageSchema>>({
@@ -60,6 +64,7 @@ const initialMessageString =
   };
 
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestedMessages, setSuggestedMessages] = useState(parseStringMessages(initialMessageString));
 
   const onSubmit = async (data: z.infer<typeof messageSchema>) => {
     setIsLoading(true);
@@ -89,10 +94,23 @@ const initialMessageString =
 
   const fetchSuggestedMessages = async () => {
     try {
-      complete('');
+      await append({
+        role: 'user',
+        content: 'Generate suggestions'
+      });
+      if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage.role === 'assistant') {
+          setSuggestedMessages(parseStringMessages(lastMessage.content));
+        }
+      }
     } catch (error) {
       console.error('Error fetching messages:', error);
-      // Handle error appropriately
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch suggested messages',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -154,7 +172,7 @@ const initialMessageString =
             {error ? (
               <p className="text-red-500">{error.message}</p>
             ) : (
-              parseStringMessages(completion).map((message, index) => (
+              suggestedMessages.map((message, index) => (
                 <Button
                   key={index}
                   variant="outline"
