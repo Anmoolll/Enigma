@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
 import { Loader2, RefreshCcw } from "lucide-react";
 import { User } from "next-auth";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AcceptMessageSchema } from "@/schemas/acceptMessageSchema";
@@ -23,7 +23,6 @@ function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { toast } = useToast();
 
@@ -122,22 +121,6 @@ function UserDashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await signOut({ redirect: false });
-      router.replace('/sign-in');
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to logout. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
-
   if (!session || !session.user) {
     return <div></div>;
   }
@@ -164,20 +147,6 @@ function UserDashboard() {
         <Link href="/dashboard" className="inline-block hover:opacity-80 transition-opacity">
           <h1 className="text-4xl font-bold">User Dashboard</h1>
         </Link>
-        <Button 
-          onClick={handleLogout} 
-          variant="outline"
-          disabled={isLoggingOut}
-        >
-          {isLoggingOut ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Logging out...
-            </>
-          ) : (
-            'Logout'
-          )}
-        </Button>
       </div>
 
       <div className="mb-4">
