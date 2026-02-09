@@ -6,6 +6,9 @@ import { Message } from '@/model/User';
 import { NextRequest } from 'next/server';
 import { authOptions } from '../../auth/[...nextauth]/options';
 
+// Force dynamic rendering since this route uses sessions and database queries
+export const dynamic = 'force-dynamic';
+
 export async function DELETE(
   request: Request,
   { params }: { params: { messageid: string } }

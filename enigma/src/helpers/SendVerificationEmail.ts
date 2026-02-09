@@ -1,6 +1,4 @@
 import nodemailer from "nodemailer";
-import { renderToStaticMarkup } from "react-dom/server";
-import VerificationEmail from "../../emails/VerificationEmails";
 import { ApiResponse } from "@/types/ApiResponse";
 
 const transporter = nodemailer.createTransport({
@@ -21,9 +19,16 @@ export async function sendVerificationEmail(
   verifyCode: string
 ): Promise<ApiResponse> {
   try {
-    const html = renderToStaticMarkup(
-      VerificationEmail({ username, otp: verifyCode })
-    );
+    const html = `
+      <html>
+        <body>
+          <h2>Hello ${username},</h2>
+          <p>Thank you for registering. Please use the following verification code to complete your registration:</p>
+          <h3>${verifyCode}</h3>
+          <p>If you did not request this code, please ignore this email.</p>
+        </body>
+      </html>
+    `;
 
     await transporter.sendMail({
       from: process.env.SMTP_FROM_EMAIL || '"Enigma" <no-reply@example.com>',
