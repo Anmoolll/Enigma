@@ -3,6 +3,8 @@ import { streamText } from 'ai';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
+// Force dynamic rendering since this route uses request body
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {

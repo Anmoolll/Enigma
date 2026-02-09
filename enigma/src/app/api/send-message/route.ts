@@ -2,6 +2,9 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
 import { Message } from "@/model/User";
 
+// Force dynamic rendering since this route handles user messages
+export const dynamic = 'force-dynamic';
+
 export async function POST(request:Request) {
     await dbConnect()
 

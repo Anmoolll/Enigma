@@ -5,6 +5,9 @@ import UserModel from "@/model/User";
 import {User} from "next-auth"
 import { log } from "console";
 
+// Force dynamic rendering since this route uses sessions and database queries
+export const dynamic = 'force-dynamic';
+
 export async function POST(request : Request){
     await dbConnect()
 
