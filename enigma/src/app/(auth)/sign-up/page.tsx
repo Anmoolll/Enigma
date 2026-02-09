@@ -75,7 +75,9 @@ export default function SignUpForm() {
         description: response.data.message,
       });
 
-      router.replace(`/verify/${username}`);
+      // Use the submitted username, not the debounced state,
+      // to ensure the verify route always matches the created user.
+      router.replace(`/verify/${encodeURIComponent(data.username)}`);
 
       setIsSubmitting(false);
     } catch (error) {

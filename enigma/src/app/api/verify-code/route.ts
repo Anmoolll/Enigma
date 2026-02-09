@@ -7,12 +7,27 @@ export async function POST(request: Request) {
 
   try {
     const { username, code } = await request.json();
-    const decodedUsername = decodeURIComponent(username);
-    const user = await UserModel.findOne({ username: decodedUsername });
+    const decodedUsername =
+      typeof username === 'string' ? decodeURIComponent(username) : '';
+
+    // Prefer lookup by username, but fall back to OTP-only lookup
+    // in case the username in the URL/body doesn't match exactly.
+    let user =
+      decodedUsername
+        ? await UserModel.findOne({ username: decodedUsername })
+        : null;
+
+    if (!user) {
+      user = await UserModel.findOne({ verifyCode: code });
+    }
 
     if (!user) {
       return Response.json(
-        { success: false, message: 'User not found' },
+        {
+          success: false,
+          message:
+            'User not found for this verification code. Please sign up again.',
+        },
         { status: 404 }
       );
     }
